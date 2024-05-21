@@ -7,36 +7,50 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
-@Configuration // このクラスは設定クラスであることを示します
-@EnableWebSecurity // Webセキュリティを有効にすることを示します
-public class SecurityConfig { // セキュリティ設定のクラス
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
 
-    @Bean // このメソッドの返り値をSpringのBeanとして登録します
-    public PasswordEncoder passwordEncoder() { // パスワードエンコーダー（パスワードのハッシュ化）を提供するメソッド
-        return new BCryptPasswordEncoder(); // パスワードをBCrypt方式でハッシュ化するエンコーダーを返します
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
-    @Bean // このメソッドの返り値をSpringのBeanとして登録します
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception { // セキュリティフィルタチェーンを定義するメソッド
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeRequests(authorizeRequests ->  // 認証リクエストを設定します
+            .cors().and() // CORSを有効にする
+            .authorizeRequests(authorizeRequests ->
                 authorizeRequests
-                    .requestMatchers("/login", "/register").permitAll() // "/login"と"/register"へのリクエストは認証なしで許可します
-                    .anyRequest().authenticated() // それ以外の全てのリクエストは認証が必要です
+                    .requestMatchers("/login", "/register", "/api/form").permitAll()
+                    .anyRequest().authenticated()
             )
-            .formLogin(formLogin ->  // フォームベースのログインを設定します
+            .formLogin(formLogin ->
                 formLogin
-                    .loginPage("/login") // ログインページのURLを設定します
-                    .permitAll() // ログインページは認証なしで許可します
+                    .loginPage("/login")
+                    .permitAll()
             )
-            .logout(logout ->  // ログアウトを設定します
+            .logout(logout ->
                 logout
-                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout")) // ログアウトのリクエストURLを設定します
+                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
             );
 
-        return http.build(); // 上記の設定を反映してHttpSecurityオブジェクトをビルドします
+        return http.build();
     }
 
-    // 他のセキュリティ設定が必要な場合は、ここに追加します
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
 }
