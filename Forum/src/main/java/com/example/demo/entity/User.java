@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,8 +23,5 @@ public class User {
 
     @Column(name = "password", nullable = false)  // "password" カラム。ユーザーのパスワードを表します
     private String password;
-
-    @Column(name = "email", nullable = false, unique = true)  // "email" カラム。ユーザーのメールアドレスを表します。同じメールアドレスのユーザーは存在できません
-    private String email;
 }
 

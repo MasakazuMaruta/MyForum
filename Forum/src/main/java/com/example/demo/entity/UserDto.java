@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.entity;
 import javax.validation.constraints.NotEmpty;
 
 import lombok.Data;
@@ -11,8 +11,4 @@ public class UserDto {  // ユーザーのデータを扱うためのクラス
 
     @NotEmpty  // パスワードは空であってはならないというルール
     private String password;  // パスワードを保存するための場所
-
-    @NotEmpty  // メールアドレスは空であってはならないというルール
-    private String email;  // メールアドレスを保存するための場所
-
 }
